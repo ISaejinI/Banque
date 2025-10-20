@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>Mini banque</title>
+    <script src="./index.js"></script>
+</head>
+
+<body style="font-family: 'Inter', sans-serif;">
+    <h1>Mini banque</h1>
+
+    <p class="lastAction"></p>
+
+    <h2>Fonctionnalités :</h2>
+    <ul>
+        <li>Une base clients</li>
+        <li>Une base de comptes bancaires</li>
+        <li>Possibilité de créer un nouveau client</li>
+        <li>Possibilité de créer un nouveau compte bancaire pour un client</li>
+        <li>Possibilité de supprimer un compte bancaire</li>
+        <li>Possibilité de déposer de l’argent sur le compte d’un client</li>
+        <li>Possibilité de retirer de l’argent du compte d’un client</li>
+        <li>Possibilité de transférer de l’argent entre deux comptes</li>
+        <li>Possibilité d’afficher le solde d’un compte pour un client donné</li>
+        <li>Possibilité d’afficher l’historique des transactions pour un compte donné</li>
+        <li>Possibilité d’afficher l’argent total détenu par un client (tous comptes confondus)</li>
+        <li>Possibilité d’afficher l’argent total détenu par la banque (tous clients confondus)</li>
+    </ul>
+
+    <h2>Logique métier :</h2>
+    <ul>
+        <li>Chaque client peut avoir plusieurs comptes bancaires</li>
+        <li>Chaque compte bancaire appartient à un seul client</li>
+        <li>On ne peut supprimer un compte que s’il n’y a plus d’argent dessus</li>
+        <li>Chaque transaction est enregistrée dans l’historique du compte (<code>deposit</code>, <code>withdrawal</code>, <code>transfer</code>) et est datée</li>
+        <li>Lors d’un transfert, deux transactions sont créées (une pour le compte émetteur et une pour le compte récepteur)</li>
+        <li>Pas de découvert autorisé</li>
+    </ul>
+
+    <h2>Infos complémentaires :</h2>
+    <ul>
+        <li>Tout se fait dans la console (pas d’interface graphique)</li>
+        <li>Quand on dit 'afficher', c’est via <code>console.log()</code></li>
+        <li>Privilégier une approche fonctionnelle (pas de POO)</li>
+        <li>Gérer les erreurs (ex : compte inexistant, solde insuffisant, etc.)</li>
+        <li>TOUT vérifier ! (Client/compte existant, montant positif, etc.)</li>
+        <li>Pour générer un identifiant unique, utiliser <code>crypto.randomUUID()</code></li>
+        <li>Penser à factoriser le code au maximum</li>
+    </ul>
+
+    <h2>Bonus :</h2>
+    <ul>
+        <li>Possibilité d’appliquer des intérêts annuels sur les comptes (ex : 1.5% par an) =&gt; nouveau type de
+            transaction <code>interest</code></li>
+        <li>Possibilité d’appliquer des frais de tenue de compte mensuels (ex : 2€ par mois) =&gt; nouveau type de
+            transaction <code>fee</code></li>
+    </ul>
+</body>
+
+</html>
