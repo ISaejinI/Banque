@@ -30,3 +30,31 @@ function createClient(name, lastName) {
     }
 }
 
+function createAccount(idClient, accountName, depositAmount) {
+    const client = datas.clients.find(client => client.id === idClient);
+    if (client != undefined) {
+
+        const newAccount = {
+            idClient,
+            accountName,
+            ammount: depositAmount,
+            transactions: []
+        }
+        
+        const currentDateTime = new Date();
+        console.log(currentDateTime);
+
+        const currentTransaction = {
+            detail: "Compte créé",
+            date: currentDateTime,
+        }
+        newAccount.transactions.push(currentTransaction)
+
+        datas.accounts.push(newAccount);
+        
+
+        return console.log(`Le compte ${accountName} a été créé avec succès avec ${depositAmount}`);
+    } else {
+        return console.log("Le client doit être un client existant");
+    }
+}
