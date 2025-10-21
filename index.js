@@ -218,3 +218,11 @@ function displayClientBalance(idClient) {
         return console.error("Le client demandé n'existe pas");
     }
 }
+
+function displayBankBalance() {
+    let totalBankBalance = 0;
+    datas.accounts.forEach(account => {
+        totalBankBalance += account.amount;
+    });
+    return console.log(`La somme totale des comptes de la banque est de ${totalBankBalance}€`);
+}
