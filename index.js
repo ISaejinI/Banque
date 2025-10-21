@@ -14,8 +14,19 @@ let datas = {
     accounts: []
 }
 
+//Fonctions globales
 const generateRandomId = () => crypto.randomUUID();
 
+function getAccount(idClient, accountName) {
+    return datas.accounts.find(account => account.idClient === idClient && account.accountName === accountName);
+}
+
+function getClient(idClient) {
+    return datas.clients.find(client => client.id === idClient);
+}
+
+
+//Fonctions de l'application
 function createClient(name, lastName) {
     if (typeof name === "string" && typeof lastName === "string") {
         const newClient = {
@@ -31,7 +42,7 @@ function createClient(name, lastName) {
 }
 
 function createAccount(idClient, accountName, depositAmount) {
-    const client = datas.clients.find(client => client.id === idClient);
+    const client = getClient(idClient);
     if (client != undefined) {
 
         const newAccount = {
@@ -60,9 +71,9 @@ function createAccount(idClient, accountName, depositAmount) {
 }
 
 function deleteAccount(idClient, accountName) {
-    const client = datas.clients.find(client => client.id === idClient);
+    const client = getClient(idClient);
     if (client != undefined) {
-        const account = datas.accounts.find(account => account.idClient === idClient && account.accountName === accountName)
+        const account = getAccount(idClient, accountName);
         if (account != undefined) {
             if (account.ammount == 0) {
                 datas.accounts.splice(datas.accounts.indexOf(account), 1);
