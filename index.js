@@ -116,6 +116,29 @@ function deposit(idClient, accountName, depositAmount) {
     }
 }
 
+function withdrawal(idClient, accountName, withdrawalAmount) {
+    const client = getClient(idClient);
+    if (client != undefined) {
+        const account = getAccount(idClient, accountName);
+        if (account != undefined) {
+            if (typeof withdrawalAmount != "number" || withdrawalAmount < 0 || withdrawalAmount > account.amount) {
+                return console.error("Le montant du retrait doit être un nombre supérieur à 0 et inférieur ou égal au solde du compte");
+            }
+            account.amount -= withdrawalAmount;
+            const currentTransaction = {
+                detail: `Retrait de ${withdrawalAmount}€`,
+                date: getCurrentDateTime(),
+            }
+            account.transactions.push(currentTransaction);
+            return console.info(`Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
+        } else {
+            return console.error("Le compte n'existe pas");
+        }
+    } else {
+        return console.error("Le client demandé n'existe pas");
+    }
+}
+
 function displayTransactions (idClient, accountName) {
     const client = getClient(idClient);
     if (client != undefined) {
@@ -140,3 +163,8 @@ createAccount(datas.clients[0].id, "Compte courant", 500);
 createAccount(datas.clients[0].id, "Livret A", 1500);
 deposit(datas.clients[0].id, "Compte courant", 200);
 displayTransactions(datas.clients[0].id, "Compte courant");
+withdrawal(datas.clients[0].id, "Compte courant", 100);
+displayTransactions(datas.clients[0].id, "Compte courant");
+deleteAccount(datas.clients[0].id, "Livret A");
+withdrawal(datas.clients[0].id, "Livret A", 1500);
+deleteAccount(datas.clients[0].id, "Livret A");
