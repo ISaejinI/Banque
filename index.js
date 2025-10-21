@@ -46,7 +46,6 @@ function createClient(name, lastName) {
 }
 
 function createAccount(idClient, accountName, depositAmount) {
-    //TODO - Vérifier si le compte existe déjà pour ce client
     const client = getClient(idClient);
     if (client != undefined) {
 
@@ -141,6 +140,40 @@ function withdrawal(idClient, accountName, withdrawalAmount) {
         }
     } else {
         return console.error("Le client demandé n'existe pas");
+    }
+}
+
+function transfert(idClientDonator, accountNameDonator, idClientReciever, accountNameReciever, transferAmount) {
+    const clientDonator = getClient(idClientDonator);
+    const clientReciever = getClient(idClientReciever);
+
+    if (clientDonator != undefined && clientReciever != undefined) {
+        const accountDonator = getAccount(idClientDonator, accountNameDonator);
+        const accountReciever = getAccount(idClientReciever, accountNameReciever);
+        if (accountDonator != undefined && accountReciever != undefined) {
+            if (typeof transferAmount != "number" || transferAmount < 0 || transferAmount > accountDonator.amount) {
+                return console.error("Le montant du transfert doit être un nombre supérieur à 0 et inférieur ou égal au solde du compte");
+            }
+            accountDonator.amount -= transferAmount;
+            let currentTransaction = {
+                detail: `Transfert de ${transferAmount}€ vers le compte de ${clientReciever.name} ${clientReciever.lastName}`,
+                date: getCurrentDateTime()
+            }
+            accountDonator.transactions.push(currentTransaction);
+
+            accountReciever.amount += transferAmount;
+            currentTransaction = {
+                detail: `Transfert de ${transferAmount}€ depuis le compte de ${clientDonator.name} ${clientDonator.lastName}`,
+                date: getCurrentDateTime()
+            }
+            accountReciever.transactions.push(currentTransaction);
+
+            return console.info(`Le transfert de ${transferAmount}€ a été effectué avec succès du compte ${accountDonator.accountName} de ${clientDonator.name} ${clientDonator.lastName} vers le compte ${accountReciever.accountName} de ${clientReciever.name} ${clientReciever.lastName}`);
+        } else {
+            return console.error("Les deux comptes doivent exister pour effectuer la transaction");
+        }
+    } else {
+        return console.error("Les deux clients doivent exister pour effectuer le transfert");
     }
 }
 
