@@ -4,7 +4,7 @@
 //         {id: "", name: "", lastName: ""}
 //     ],
 //     accounts: [
-//         {idClient: "", accountName: "", ammount: "", transactions: [] }
+//         {idClient: "", accountName: "", amount: "", transactions: [] }
 //     ],
 // }
 
@@ -49,10 +49,14 @@ function createAccount(idClient, accountName, depositAmount) {
     const client = getClient(idClient);
     if (client != undefined) {
 
+        if (typeof depositAmount != "number" || depositAmount < 0) {
+            return console.log("Le montant du dépôt doit être un nombre supérieur à 0");
+        }
+
         const newAccount = {
             idClient,
             accountName,
-            ammount: depositAmount,
+            amount: depositAmount,
             transactions: []
         }
 
@@ -63,7 +67,7 @@ function createAccount(idClient, accountName, depositAmount) {
         newAccount.transactions.push(currentTransaction)
         datas.accounts.push(newAccount);
         
-        return console.log(`Le compte ${accountName} a été créé avec succès avec ${depositAmount}`);
+        return console.log(`Le compte ${accountName} a été créé avec succès avec ${depositAmount}€ à l'intérieur`);
     } else {
         return console.log("Le client doit être un client existant");
     }
@@ -74,7 +78,7 @@ function deleteAccount(idClient, accountName) {
     if (client != undefined) {
         const account = getAccount(idClient, accountName);
         if (account != undefined) {
-            if (account.ammount == 0) {
+            if (account.amount == 0) {
                 datas.accounts.splice(datas.accounts.indexOf(account), 1);
                 return console.log("Le compte a bien été supprimé");
             } else {
