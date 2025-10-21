@@ -153,21 +153,3 @@ function displayTransactions (idClient, accountName) {
         return console.error("Le client demandé n'existe pas");
     }
 }
-
-
-
-
-// Test des fonctions
-createClient("Lou", "Biet");
-createClient("Okami", "Biet");
-createAccount(datas.clients[0].id, "Compte courant", 500);
-createAccount(datas.clients[0].id, "Livret A", 1500);
-createAccount(datas.clients[1].id, "Compte courant", 500);
-createAccount(datas.clients[1].id, "Livret A", 1500);
-deposit(datas.clients[0].id, "Compte courant", 200);
-displayTransactions(datas.clients[0].id, "Compte courant");
-withdrawal(datas.clients[0].id, "Compte courant", 100);
-displayTransactions(datas.clients[0].id, "Compte courant");
-deleteAccount(datas.clients[0].id, "Livret A");
-withdrawal(datas.clients[0].id, "Livret A", 1500);
-deleteAccount(datas.clients[0].id, "Livret A");
