@@ -39,3 +39,7 @@ displayAccountBalance(datas.clients[0].id, "Compte courant"); // doit afficher l
 //NOTE - Test de la fonctionnalité d'affichage des transactions
 displayTransactions(datas.clients[1].id, "Compte courant"); // doit afficher les transactions du compte courant
 // displayTransactions(datas.clients[0].id, "Livret A"); // doit retourner une erreur car le compte n'existe plus
+
+//NOTE - Test de la fonctionnalité d'affichage de l'argent total d'un client
+displayClientBalance(datas.clients[0].id); // doit afficher le total des comptes du client 0
+displayClientBalance(datas.clients[1].id); // doit afficher le total des comptes du client 1

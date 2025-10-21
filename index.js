@@ -205,3 +205,16 @@ function displayTransactions (idClient, accountName) {
     }
 }
 
+function displayClientBalance(idClient) {
+    const client = getClient(idClient);
+    if (client != undefined) {
+        let totalBalance = 0;
+        const allAccounts = datas.accounts.filter(account =>  account.idClient === idClient);
+        allAccounts.forEach(account => {
+            totalBalance += account.amount;
+        });
+        return console.log(`La somme totale des compte de ${client.name} ${client.lastName} est de ${totalBalance}€`);
+    } else {
+        return console.error("Le client demandé n'existe pas");
+    }
+}
