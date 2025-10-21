@@ -58,3 +58,23 @@ function createAccount(idClient, accountName, depositAmount) {
         return console.log("Le client doit être un client existant");
     }
 }
+
+function deleteAccount(idClient, accountName) {
+    const client = datas.clients.find(client => client.id === idClient);
+    if (client != undefined) {
+        const account = datas.accounts.find(account => account.idClient === idClient && account.accountName === accountName)
+        if (account != undefined) {
+            if (account.ammount == 0) {
+                datas.accounts.splice(datas.accounts.indexOf(account), 1);
+                return console.log("Le compte a bien été supprimé");
+            } else {
+                return console.log("Le compte doit être vide pour pouvoir le supprimer");
+            }
+        } else {
+            return console.log("Le compte doit être existant pour le supprimer");
+        }
+    } else {
+        return console.log("Le client doit être un client existant");
+        
+    }
+}
