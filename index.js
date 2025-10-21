@@ -39,9 +39,9 @@ function createClient(name, lastName) {
             lastName
         }
         datas.clients.push(newClient);
-        return console.log(`Le client ${name} ${lastName} a été ajouté avec l'id ${newClient.id}`);
+        return console.info(`Le client ${name} ${lastName} a été ajouté avec l'id ${newClient.id}`);
     } else {
-       return console.log("Le nom et le prénom doivent être des chaînes de caractères");
+       return console.error("Le nom et le prénom doivent être des chaînes de caractères");
     }
 }
 
@@ -50,7 +50,7 @@ function createAccount(idClient, accountName, depositAmount) {
     if (client != undefined) {
 
         if (typeof depositAmount != "number" || depositAmount < 0) {
-            return console.log("Le montant du dépôt doit être un nombre supérieur à 0");
+            return console.error("Le montant du dépôt doit être un nombre supérieur à 0");
         }
 
         const newAccount = {
@@ -67,9 +67,9 @@ function createAccount(idClient, accountName, depositAmount) {
         newAccount.transactions.push(currentTransaction)
         datas.accounts.push(newAccount);
         
-        return console.log(`Le compte ${accountName} a été créé avec succès avec ${depositAmount}€ à l'intérieur`);
+        return console.info(`Le compte ${accountName} a été créé avec succès avec ${depositAmount}€ à l'intérieur`);
     } else {
-        return console.log("Le client doit être un client existant");
+        return console.error("Le client doit être un client existant");
     }
 }
 
@@ -80,14 +80,38 @@ function deleteAccount(idClient, accountName) {
         if (account != undefined) {
             if (account.amount == 0) {
                 datas.accounts.splice(datas.accounts.indexOf(account), 1);
-                return console.log("Le compte a bien été supprimé");
+                return console.info("Le compte a bien été supprimé");
             } else {
-                return console.log("Le compte doit être vide pour pouvoir le supprimer");
+                return console.error("Le compte doit être vide pour pouvoir le supprimer");
             }
         } else {
-            return console.log("Le compte doit être existant pour le supprimer");
+        return console.error("Le client doit être un client existant");
+    }
+    } else {
+        return console.error("Le client doit être un client existant");
+    }
+}
+
+function deposit(idClient, accountName, depositAmount) {
+    const client = getClient(idClient);
+    if (client != undefined) {
+        if (typeof depositAmount != "number" || depositAmount < 0) {
+            return console.error("Le montant du dépôt doit être un nombre supérieur à 0");
+        }
+
+        const account = getAccount(idClient, accountName);
+        if (account != undefined) {
+            account.amount += depositAmount;
+            const currentTransaction = {
+                detail: `Dépôt de ${depositAmount}€`,
+                date: getCurrentDateTime(),
+            }
+            account.transactions.push(currentTransaction);
+            return console.info(`Le dépôt de ${depositAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
+        } else {
+            return console.error("Le compte n'existe pas");
         }
     } else {
-        return console.log("Le client doit être un client existant");
+        return console.error("Le client demandé n'existe pas");
     }
 }
