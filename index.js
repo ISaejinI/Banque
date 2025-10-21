@@ -177,6 +177,20 @@ function transfert(idClientDonator, accountNameDonator, idClientReciever, accoun
     }
 }
 
+function displayAccountBalance(idClient, accountName) {
+    const client = getClient(idClient);
+    if (client != undefined) {
+        const account = getAccount(idClient, accountName);
+        if (account != undefined) {
+            return console.info(`Le solde du compte ${accountName} est de ${account.amount}€`);
+        } else {
+            return console.error("Le compte n'existe pas");
+        }
+    } else {
+        return console.error("Le client demandé n'existe pas");
+    }
+}
+
 function displayTransactions (idClient, accountName) {
     const client = getClient(idClient);
     if (client != undefined) {
@@ -190,3 +204,4 @@ function displayTransactions (idClient, accountName) {
         return console.error("Le client demandé n'existe pas");
     }
 }
+

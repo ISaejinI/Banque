@@ -33,6 +33,9 @@ transfert(datas.clients[0].id, "Compte courant", datas.clients[1].id, "Compte co
 withdrawal(datas.clients[0].id, "Livret A", 1500);
 deleteAccount(datas.clients[0].id, "Livret A"); // doit supprimer le compte
 
+//NOTE - Test de la fonctionnalité d'affichage du solde d'un compte
+displayAccountBalance(datas.clients[0].id, "Compte courant"); // doit afficher le solde du compte courant
+
 //NOTE - Test de la fonctionnalité d'affichage des transactions
 displayTransactions(datas.clients[1].id, "Compte courant"); // doit afficher les transactions du compte courant
 // displayTransactions(datas.clients[0].id, "Livret A"); // doit retourner une erreur car le compte n'existe plus
