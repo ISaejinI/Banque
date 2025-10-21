@@ -50,6 +50,10 @@ function createAccount(idClient, accountName, depositAmount) {
     const client = getClient(idClient);
     if (client != undefined) {
 
+        if (getAccount(idClient, accountName) != undefined) {
+            return console.error("Le compte existe déjà pour ce client");
+        }
+
         if (typeof depositAmount != "number" || depositAmount < 0) {
             return console.error("Le montant du dépôt doit être un nombre supérieur à 0");
         }
