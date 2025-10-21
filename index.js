@@ -46,6 +46,7 @@ function createClient(name, lastName) {
 }
 
 function createAccount(idClient, accountName, depositAmount) {
+    //TODO - Vérifier si le compte existe déjà pour ce client
     const client = getClient(idClient);
     if (client != undefined) {
 
@@ -161,6 +162,8 @@ createClient("Lou", "Biet");
 createClient("Okami", "Biet");
 createAccount(datas.clients[0].id, "Compte courant", 500);
 createAccount(datas.clients[0].id, "Livret A", 1500);
+createAccount(datas.clients[1].id, "Compte courant", 500);
+createAccount(datas.clients[1].id, "Livret A", 1500);
 deposit(datas.clients[0].id, "Compte courant", 200);
 displayTransactions(datas.clients[0].id, "Compte courant");
 withdrawal(datas.clients[0].id, "Compte courant", 100);
