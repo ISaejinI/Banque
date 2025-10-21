@@ -115,3 +115,28 @@ function deposit(idClient, accountName, depositAmount) {
         return console.error("Le client demandé n'existe pas");
     }
 }
+
+function displayTransactions (idClient, accountName) {
+    const client = getClient(idClient);
+    if (client != undefined) {
+        const account = getAccount(idClient, accountName);
+        if (account != undefined) {
+            console.table(account.transactions);
+        } else {
+            return console.error("Le compte n'existe pas");
+        }
+    } else {
+        return console.error("Le client demandé n'existe pas");
+    }
+}
+
+
+
+
+// Test des fonctions
+createClient("Lou", "Biet");
+createClient("Okami", "Biet");
+createAccount(datas.clients[0].id, "Compte courant", 500);
+createAccount(datas.clients[0].id, "Livret A", 1500);
+deposit(datas.clients[0].id, "Compte courant", 200);
+displayTransactions(datas.clients[0].id, "Compte courant");
