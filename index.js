@@ -193,8 +193,11 @@ function displayBankBalance() {
 function applyInterests() {
     const interest = 0.015;
     datas.accounts.forEach(account => {
-        account.amount += account.amount * interest;
-        createTransaction(account, `Application des intérêts de ${interest * 100}%`);
+        const lastInterestTransaction = account.transactions.findLast(transaction => transaction.detail == 'Application des intérêts');
+        if (account.amount > 0 && lastInterestTransaction === undefined || account.amount > 0 && lastInterestTransaction !== undefined && getCurrentDateTime() >= lastInterestTransaction.date.setFullYear(lastInterestTransaction.date.getFullYear() + 1)) {
+            account.amount += account.amount * interest;
+            createTransaction(account, `Application des intérêts`);
+        }
     })
     return console.log("Les intérêts ont été appliqués à tous les comptes");
 }
