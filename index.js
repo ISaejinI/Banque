@@ -55,7 +55,7 @@ function createTransaction(account, detail) {
     account.transactions.push(newTransaction);
 }
 
-//Fonctions de l'application
+//Fonctionnalités de l'application
 function createClient(name, lastName) {
     if (typeof name === "string" && typeof lastName === "string") {
         const newClient = {
@@ -74,8 +74,11 @@ function createAccount(idClient, accountName, depositAmount) {
     const client = getClient(idClient);
     const account = getAccount(idClient, accountName);
     const number = isValidNumber(depositAmount);
-    if (client === false || account != false || number === false) {
+    if (client === false || number === false) {
         return;
+    }
+    if (account != false) {
+        return console.error("Le compte existe déjà pour ce client");
     }
     const newAccount = {
         idClient,
@@ -184,4 +187,18 @@ function displayBankBalance() {
         totalBankBalance += account.amount;
     });
     return console.log(`La somme totale des comptes de la banque est de ${totalBankBalance}€`);
+}
+
+// Bonus
+function applyInterests() {
+    const interest = 0.015;
+    datas.accounts.forEach(account => {
+        account.amount += account.amount * interest;
+        createTransaction(account, `Application des intérêts de ${interest * 100}%`);
+    })
+    return console.log("Les intérêts ont été appliqués à tous les comptes");
+}
+
+function applyFees() {
+
 }

@@ -46,3 +46,6 @@ displayClientBalance(datas.clients[1].id); // doit afficher le total des comptes
 
 //NOTE - Test de la fonctionnalité d'affichage de l'argent total de la banque
 displayBankBalance(); // doit afficher le total des comptes de la banque
+
+//NOTE - Test de la fonctionnalité d'application des intérêts
+applyInterests(); // doit appliquer les intérêts à tous les comptes
