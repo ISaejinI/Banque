@@ -194,7 +194,9 @@ function applyInterests() {
     const interest = 0.015;
     datas.accounts.forEach(account => {
         const lastInterestTransaction = account.transactions.findLast(transaction => transaction.detail == 'Application des intérêts');
-        if (account.amount > 0 && lastInterestTransaction === undefined || account.amount > 0 && lastInterestTransaction !== undefined && getCurrentDateTime() >= lastInterestTransaction.date.setFullYear(lastInterestTransaction.date.getFullYear() + 1)) {
+        const copyLastTransaction = lastInterestTransaction;
+        const copyDateLastInterestTransaction = (lastInterestTransaction === undefined? "" : new Date(copyLastTransaction.date));
+        if (account.amount > 0 && lastInterestTransaction === undefined || account.amount > 0 && lastInterestTransaction !== undefined && getCurrentDateTime() >= copyDateLastInterestTransaction.setFullYear(copyDateLastInterestTransaction.getFullYear() + 1)) {
             account.amount += account.amount * interest;
             createTransaction(account, `Application des intérêts`);
         }
@@ -205,8 +207,11 @@ function applyInterests() {
 function applyFees() {
     const fee = 2;
     datas.accounts.forEach(account => {
-        account.amount -= fee;
-        createTransaction(account, `Application des frais de tenue de compte de ${fee}€`);
+        const lastFeeTransaction = account.transactions.findLast(transaction => transaction.detail == 'Application des frais de tenue de compte');
+        if (account.amount > 0 && lastFeeTransaction === undefined || account.amount > 0 && lastFeeTransaction !== undefined && getCurrentDateTime() >= lastFeeTransaction.date.setMonth(lastFeeTransaction.date.getMonth() + 1)) {
+            account.amount -= fee;
+            createTransaction(account, `Application des frais de tenue de compte`);
+        }
     })
     return console.log("Les frais de tenue de compte ont été appliqués à tous les comptes");
 }

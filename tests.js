@@ -50,10 +50,14 @@ displayBankBalance(); // doit afficher le total des comptes de la banque
 //NOTE - Test de la fonctionnalité d'application des intérêts
 applyInterests(); // doit appliquer les intérêts à tous les comptes
 applyInterests(); // doit parcourir les comptes sans appliquer d'intérêts
+displayTransactions(datas.clients[1].id, "Compte courant");
 createAccount(datas.clients[1].id, "Compte tierce", 300); // doit créer un compte avec 300€
 applyInterests(); // doit appliquer les intérêts au dernier compte créé
-displayTransactions(datas.clients[1].id, "Compte courant");
 
 //NOTE - Test de la fonctionnalité d'application des frais de tenue de compte
-// applyFees(); // doit appliquer les frais à tous les comptes
-// displayTransactions(datas.clients[1].id, "Compte courant");
+applyFees(); // doit appliquer les frais à tous les comptes
+displayTransactions(datas.clients[1].id, "Compte courant");
+applyFees(); // doit parcourir les comptes sans appliquer de frais
+createAccount(datas.clients[0].id, "Compte épargne", 800); // doit créer un compte avec 800€
+applyFees(); // doit appliquer les frais au dernier compte créé
+displayTransactions(datas.clients[0].id, "Compte courant");
