@@ -194,8 +194,7 @@ function applyInterests() {
     const interest = 0.015;
     datas.accounts.forEach(account => {
         const lastInterestTransaction = account.transactions.findLast(transaction => transaction.detail == 'Application des intérêts');
-        const copyLastTransaction = lastInterestTransaction;
-        const copyDateLastInterestTransaction = (lastInterestTransaction === undefined? "" : new Date(copyLastTransaction.date));
+        const copyDateLastInterestTransaction = (lastInterestTransaction === undefined? "" : new Date(lastInterestTransaction.date));
         if (account.amount > 0 && lastInterestTransaction === undefined || account.amount > 0 && lastInterestTransaction !== undefined && getCurrentDateTime() >= copyDateLastInterestTransaction.setFullYear(copyDateLastInterestTransaction.getFullYear() + 1)) {
             account.amount += account.amount * interest;
             createTransaction(account, `Application des intérêts`);
@@ -208,7 +207,8 @@ function applyFees() {
     const fee = 2;
     datas.accounts.forEach(account => {
         const lastFeeTransaction = account.transactions.findLast(transaction => transaction.detail == 'Application des frais de tenue de compte');
-        if (account.amount > 0 && lastFeeTransaction === undefined || account.amount > 0 && lastFeeTransaction !== undefined && getCurrentDateTime() >= lastFeeTransaction.date.setMonth(lastFeeTransaction.date.getMonth() + 1)) {
+        const copyDateLastFeeTransaction = (lastFeeTransaction === undefined? "" : new Date(lastFeeTransaction.date));
+        if (account.amount > 0 && lastFeeTransaction === undefined || account.amount > 0 && lastFeeTransaction !== undefined && getCurrentDateTime() >= copyDateLastFeeTransaction.setMonth(copyDateLastFeeTransaction.getMonth() + 1)) {
             account.amount -= fee;
             createTransaction(account, `Application des frais de tenue de compte`);
         }
