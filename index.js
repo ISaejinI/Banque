@@ -200,5 +200,10 @@ function applyInterests() {
 }
 
 function applyFees() {
-
+    const fee = 2;
+    datas.accounts.forEach(account => {
+        account.amount -= fee;
+        createTransaction(account, `Application des frais de tenue de compte de ${fee}€`);
+    })
+    return console.log("Les frais de tenue de compte ont été appliqués à tous les comptes");
 }

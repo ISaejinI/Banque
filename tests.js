@@ -49,3 +49,7 @@ displayBankBalance(); // doit afficher le total des comptes de la banque
 
 //NOTE - Test de la fonctionnalité d'application des intérêts
 applyInterests(); // doit appliquer les intérêts à tous les comptes
+
+//NOTE - Test de la fonctionnalité d'application des frais de tenue de compte
+applyFees(); // doit appliquer les frais à tous les comptes
+displayTransactions(datas.clients[1].id, "Compte courant");
