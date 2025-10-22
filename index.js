@@ -17,18 +17,43 @@ let datas = {
 //Fonctions globales
 const generateRandomId = () => crypto.randomUUID();
 
-function getAccount(idClient, accountName) {
-    return datas.accounts.find(account => account.idClient === idClient && account.accountName === accountName);
+function getClient(idClient) {
+    const client = datas.clients.find(client => client.id === idClient);
+    if (client === undefined) {
+        console.error("Le client demandé n'existe pas");
+        return false;
+    }
+    return client;
 }
 
-function getClient(idClient) {
-    return datas.clients.find(client => client.id === idClient);
+function getAccount(idClient, accountName) {
+    const account = datas.accounts.find(account => account.idClient === idClient && account.accountName === accountName);
+    if (account === undefined) {
+        console.error("Le compte demandé n'existe pas");
+        return false;
+    }
+    return account;
+}
+
+function isValidNumber(value) {
+    if (typeof value !== 'number' || value <= 0) {
+        console.error("La valeur doit être un nombre supérieur à 0");
+        return false;
+    }
+    return true;
 }
 
 function getCurrentDateTime() {
     return new Date();
 }
 
+function createTransaction(account, detail) {
+    const newTransaction = {
+        detail,
+        date: getCurrentDateTime()
+    }
+    account.transactions.push(newTransaction);
+}
 
 //Fonctions de l'application
 function createClient(name, lastName) {
@@ -47,176 +72,110 @@ function createClient(name, lastName) {
 
 function createAccount(idClient, accountName, depositAmount) {
     const client = getClient(idClient);
-    if (client != undefined) {
-
-        if (getAccount(idClient, accountName) != undefined) {
-            return console.error("Le compte existe déjà pour ce client");
-        }
-
-        if (typeof depositAmount != "number" || depositAmount < 0) {
-            return console.error("Le montant du dépôt doit être un nombre supérieur à 0");
-        }
-
-        const newAccount = {
-            idClient,
-            accountName,
-            amount: depositAmount,
-            transactions: []
-        }
-
-        const currentTransaction = {
-            detail: "Compte créé",
-            date: getCurrentDateTime(),
-        }
-        newAccount.transactions.push(currentTransaction)
-        datas.accounts.push(newAccount);
-        
-        return console.info(`Le compte ${accountName} a été créé avec succès avec ${depositAmount}€ à l'intérieur`);
-    } else {
-        return console.error("Le client doit être un client existant");
+    const account = getAccount(idClient, accountName);
+    const number = isValidNumber(depositAmount);
+    if (client === false || account != false || number === false) {
+        return;
     }
+    const newAccount = {
+        idClient,
+        accountName,
+        amount: depositAmount,
+        transactions: []
+    }
+    createTransaction(newAccount, `Compte créé avec un dépôt initial de ${depositAmount}€`);
+    datas.accounts.push(newAccount);
+    return console.info(`Le compte ${accountName} a été créé avec succès avec ${depositAmount}€ à l'intérieur`);
 }
 
 function deleteAccount(idClient, accountName) {
     const client = getClient(idClient);
-    if (client != undefined) {
-        const account = getAccount(idClient, accountName);
-        if (account != undefined) {
-            if (account.amount == 0) {
-                datas.accounts.splice(datas.accounts.indexOf(account), 1);
-                return console.info("Le compte a bien été supprimé");
-            } else {
-                return console.error("Le compte doit être vide pour pouvoir le supprimer");
-            }
-        } else {
-        return console.error("Le client doit être un client existant");
+    const account = getAccount(idClient, accountName);
+    if (client === false || account === false) {
+        return;
     }
-    } else {
-        return console.error("Le client doit être un client existant");
+    if (account.amount > 0) {
+        return console.error("Le compte doit être vide pour pouvoir le supprimer");
     }
+    datas.accounts.splice(datas.accounts.indexOf(account), 1);
+    return console.info("Le compte a bien été supprimé");
 }
 
 function deposit(idClient, accountName, depositAmount) {
     const client = getClient(idClient);
-    if (client != undefined) {
-        if (typeof depositAmount != "number" || depositAmount < 0) {
-            return console.error("Le montant du dépôt doit être un nombre supérieur à 0");
-        }
-
-        const account = getAccount(idClient, accountName);
-        if (account != undefined) {
-            account.amount += depositAmount;
-            const currentTransaction = {
-                detail: `Dépôt de ${depositAmount}€`,
-                date: getCurrentDateTime(),
-            }
-            account.transactions.push(currentTransaction);
-            return console.info(`Le dépôt de ${depositAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
-        } else {
-            return console.error("Le compte n'existe pas");
-        }
-    } else {
-        return console.error("Le client demandé n'existe pas");
+    const account = getAccount(idClient, accountName);
+    const number = isValidNumber(depositAmount);
+    if (client === false || account === false || number === false) {
+        return;
     }
+    account.amount += depositAmount;
+    createTransaction(account, `Dépôt de ${depositAmount}€`);
+    return console.info(`Le dépôt de ${depositAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
 }
 
 function withdrawal(idClient, accountName, withdrawalAmount) {
     const client = getClient(idClient);
-    if (client != undefined) {
-        const account = getAccount(idClient, accountName);
-        if (account != undefined) {
-            if (typeof withdrawalAmount != "number" || withdrawalAmount < 0 || withdrawalAmount > account.amount) {
-                return console.error("Le montant du retrait doit être un nombre supérieur à 0 et inférieur ou égal au solde du compte");
-            }
-            account.amount -= withdrawalAmount;
-            const currentTransaction = {
-                detail: `Retrait de ${withdrawalAmount}€`,
-                date: getCurrentDateTime(),
-            }
-            account.transactions.push(currentTransaction);
-            return console.info(`Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
-        } else {
-            return console.error("Le compte n'existe pas");
-        }
-    } else {
-        return console.error("Le client demandé n'existe pas");
+    const account = getAccount(idClient, accountName);
+    const number = isValidNumber(withdrawalAmount);
+    if (client === false || account === false || number === false) {
+        return;
     }
+    if (withdrawalAmount > account.amount) {
+        return console.error("Vous ne pouvez pas retirer plus que le solde actuel du compte");
+    }
+    account.amount -= withdrawalAmount;
+    createTransaction(account, `Retrait de ${withdrawalAmount}€`);
+    return console.info(`Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
 }
 
 function transfert(idClientDonator, accountNameDonator, idClientReciever, accountNameReciever, transferAmount) {
     const clientDonator = getClient(idClientDonator);
+    const accountDonator = getAccount(idClientDonator, accountNameDonator);
     const clientReciever = getClient(idClientReciever);
-
-    if (clientDonator != undefined && clientReciever != undefined) {
-        const accountDonator = getAccount(idClientDonator, accountNameDonator);
-        const accountReciever = getAccount(idClientReciever, accountNameReciever);
-        if (accountDonator != undefined && accountReciever != undefined) {
-            if (typeof transferAmount != "number" || transferAmount < 0 || transferAmount > accountDonator.amount) {
-                return console.error("Le montant du transfert doit être un nombre supérieur à 0 et inférieur ou égal au solde du compte");
-            }
-            accountDonator.amount -= transferAmount;
-            let currentTransaction = {
-                detail: `Transfert de ${transferAmount}€ vers le compte de ${clientReciever.name} ${clientReciever.lastName}`,
-                date: getCurrentDateTime()
-            }
-            accountDonator.transactions.push(currentTransaction);
-
-            accountReciever.amount += transferAmount;
-            currentTransaction = {
-                detail: `Transfert de ${transferAmount}€ depuis le compte de ${clientDonator.name} ${clientDonator.lastName}`,
-                date: getCurrentDateTime()
-            }
-            accountReciever.transactions.push(currentTransaction);
-
-            return console.info(`Le transfert de ${transferAmount}€ a été effectué avec succès du compte ${accountDonator.accountName} de ${clientDonator.name} ${clientDonator.lastName} vers le compte ${accountReciever.accountName} de ${clientReciever.name} ${clientReciever.lastName}`);
-        } else {
-            return console.error("Les deux comptes doivent exister pour effectuer la transaction");
-        }
-    } else {
-        return console.error("Les deux clients doivent exister pour effectuer le transfert");
+    const accountReciever = getAccount(idClientReciever, accountNameReciever);
+    const number = isValidNumber(transferAmount);
+    if (clientDonator === false || clientReciever === false || accountDonator === false || accountReciever === false || number === false) {
+        return;
     }
+    if (transferAmount > accountDonator.amount) {
+        return console.error("Vous ne pouvez pas transférer plus que le solde actuel du compte");
+    }
+    accountDonator.amount -= transferAmount;
+    createTransaction(accountDonator, `Transfert de ${transferAmount}€ vers le compte de ${clientReciever.name} ${clientReciever.lastName}`);
+    accountReciever.amount += transferAmount;
+    createTransaction(accountReciever, `Transfert de ${transferAmount}€ depuis le compte de ${clientDonator.name} ${clientDonator.lastName}`);
+    return console.info(`Le transfert de ${transferAmount}€ a été effectué avec succès du compte ${accountDonator.accountName} de ${clientDonator.name} ${clientDonator.lastName} vers le compte ${accountReciever.accountName} de ${clientReciever.name} ${clientReciever.lastName}`);
 }
 
 function displayAccountBalance(idClient, accountName) {
     const client = getClient(idClient);
-    if (client != undefined) {
-        const account = getAccount(idClient, accountName);
-        if (account != undefined) {
-            return console.info(`Le solde du compte ${accountName} est de ${account.amount}€`);
-        } else {
-            return console.error("Le compte n'existe pas");
-        }
-    } else {
-        return console.error("Le client demandé n'existe pas");
+    const account = getAccount(idClient, accountName);
+    if (client === false || account === false) {
+        return;
     }
+    return console.info(`Le solde du compte ${accountName} est de ${account.amount}€`);
 }
 
 function displayTransactions (idClient, accountName) {
     const client = getClient(idClient);
-    if (client != undefined) {
-        const account = getAccount(idClient, accountName);
-        if (account != undefined) {
-            console.table(account.transactions);
-        } else {
-            return console.error("Le compte n'existe pas");
-        }
-    } else {
-        return console.error("Le client demandé n'existe pas");
+    const account = getAccount(idClient, accountName);
+    if (client === false || account === false) {
+        return;
     }
+    console.table(account.transactions);
 }
 
 function displayClientBalance(idClient) {
     const client = getClient(idClient);
-    if (client != undefined) {
-        let totalBalance = 0;
-        const allAccounts = datas.accounts.filter(account =>  account.idClient === idClient);
-        allAccounts.forEach(account => {
-            totalBalance += account.amount;
-        });
-        return console.log(`La somme totale des compte de ${client.name} ${client.lastName} est de ${totalBalance}€`);
-    } else {
-        return console.error("Le client demandé n'existe pas");
+    if (client === false) {
+        return;
     }
+    const allAccounts = datas.accounts.filter(account => account.idClient === idClient);
+    let totalBalance = 0;
+    allAccounts.forEach(account => {
+        totalBalance += account.amount;
+    });
+    return console.log(`La somme totale des comptes de ${client.name} ${client.lastName} est de ${totalBalance}€`);
 }
 
 function displayBankBalance() {
