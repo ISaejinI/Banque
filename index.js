@@ -254,7 +254,7 @@ function putAccountsInSelects(idClient, selectId) {
     const accounts = datas.accounts.filter(account => account.idClient === idClient);
     let inputs = `<option selected value="">Sélectionner un compte</option>`;
     accounts.forEach(account => {
-        inputs += `<option value="${account.accountName}">${account.accountName}</option>`;
+        inputs += `<option value="${account.accountName}">${account.accountName} - ${account.amount}€</option>`;
     });
     select.innerHTML = '';
     select.innerHTML += inputs;
@@ -309,4 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('depositAmount').value = '';
         showAlert(result.status, result.message);
     })
+
+    //Gestion du formulaire de retrait d'argent
 });
