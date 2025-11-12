@@ -138,7 +138,8 @@ function deleteAccount(idClient, accountName) {
         // return console.error("Le compte doit être vide pour pouvoir le supprimer");
     }
     let localDatas = getDatasFromLocalStorage();
-    localDatas.accounts.splice(localDatas.accounts.indexOf(account), 1);
+    const accountIndex = getAccountIndex(account);
+    localDatas.accounts.splice(accountIndex, 1);
     pushDatasToLocalStorage(localDatas);
     // return console.info("Le compte a bien été supprimé");
     return { status: 'success', message: "Le compte a bien été supprimé" };
