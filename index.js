@@ -284,9 +284,27 @@ function putClientsInListing () {
     clientsListContainer.innerHTML += clientsList;
 }
 
+//Affichage des comptes dans le listing
+function putAccountsInListing () {
+    const accountsListContainer = document.getElementById('accountsList');
+    const accounts = datas.accounts;
+    let accountsList = '';
+
+    accounts.forEach(account => {
+        let client = getClient(account.idClient);
+        accountsList += `<div class="accountContainer"><div><h3>${account.accountName}</h3><p class="clientId">${client.name} ${client.lastName} (ID : ${client.id})</p></div><div><p>Solde du compte :</p><p class="clientBalance"><b>${account.amount}€</b></p></div></div>`;
+    })
+
+    accountsListContainer.innerHTML = '';
+    accountsListContainer.innerHTML += accountsList;
+}
+
+
+//Rafraichir toutes les informations affichées
 function refreshDisplayedInfo() {
     putClientsInSelects();
     putClientsInListing();
+    putAccountsInListing();
 }
 
 // Gestion des formulaires
