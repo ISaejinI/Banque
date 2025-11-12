@@ -77,11 +77,12 @@
             <div class="formContainer">
                 <h2>Retrait d'argent</h2>
                 <form>
-                    <label for="withdrawalClientId">Id du client</label>
-                    <input type="text" name="withdrawalClientId" id="withdrawalClientId" placeholder="Id du client">
+                    <label for="withdrawalClient">Client</label>
+                    <select name="withdrawalClient" id="withdrawalClient" class="clientIdSelect">
+                    </select>
                     <label for="withdrawalAccountName">Nom du compte</label>
-                    <input type="text" name="withdrawalAccountName" id="withdrawalAccountName"
-                        placeholder="Nom du compte">
+                    <select name="withdrawalAccountName" id="withdrawalAccountName">
+                    </select>
                     <label for="withdrawalAmount">Montant du retrait</label>
                     <input type="number" name="withdrawalAmount" id="withdrawalAmount" placeholder="Montant du retrait">
                     <button type="submit" id="withdrawal">Retirer l'argent</button>

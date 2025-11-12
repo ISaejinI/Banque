@@ -130,11 +130,13 @@ function withdrawal(idClient, accountName, withdrawalAmount) {
         return;
     }
     if (withdrawalAmount > account.amount) {
-        return console.error("Vous ne pouvez pas retirer plus que le solde actuel du compte");
+        return { status: 'error', message: "Vous ne pouvez pas retirer plus que le solde actuel du compte" };
+        //return console.error("Vous ne pouvez pas retirer plus que le solde actuel du compte");
     }
     account.amount -= withdrawalAmount;
     createTransaction(account, `Retrait de ${withdrawalAmount}€`);
-    return console.info(`Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
+    return { status: 'success', message: `Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€` };
+    //return console.info(`Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
 }
 
 function transfert(idClientDonator, accountNameDonator, idClientReciever, accountNameReciever, transferAmount) {
@@ -311,4 +313,21 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     //Gestion du formulaire de retrait d'argent
+    const withdrawalButton = document.getElementById('withdrawal');
+    const withdrawalAccountSelect = document.getElementById('withdrawalClient');
+    withdrawalAccountSelect.addEventListener('change', (e) => {
+        const idClient = e.target.value;
+        putAccountsInSelects(idClient, 'withdrawalAccountName');
+    })
+    withdrawalButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        const idClient = document.getElementById('withdrawalClient').value;
+        const accountName = document.getElementById('withdrawalAccountName').value;
+        const withdrawalAmount = Number(document.getElementById('withdrawalAmount').value);
+        const result = withdrawal(idClient, accountName, withdrawalAmount);
+        document.getElementById('withdrawalClient').value = '';
+        document.getElementById('withdrawalAccountName').value = '';
+        document.getElementById('withdrawalAmount').value = '';
+        showAlert(result.status, result.message);
+    })
 });
