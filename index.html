@@ -92,17 +92,17 @@
                 <h2>Transfert d'argent</h2>
                 <form>
                     <label for="transferSenderClientId">Id du client émetteur</label>
-                    <input type="text" name="transferSenderClientId" id="transferSenderClientId"
-                        placeholder="Id du client émetteur">
+                    <select name="transferSenderClientId" id="transferSenderClientId" class="clientIdSelect">    
+                    </select>
                     <label for="transferSenderAccountName">Nom du compte émetteur</label>
-                    <input type="text" name="transferSenderAccountName" id="transferSenderAccountName"
-                        placeholder="Nom du compte émetteur">
+                    <select name="transferSenderAccountName" id="transferSenderAccountName">
+                    </select>
                     <label for="transferReceiverClientId">Id du client récepteur</label>
-                    <input type="text" name="transferReceiverClientId" id="transferReceiverClientId"
-                        placeholder="Id du client récepteur">
+                    <select name="transferReceiverClientId" id="transferReceiverClientId" class="clientIdSelect">    
+                    </select>
                     <label for="transferReceiverAccountName">Nom du compte récepteur</label>
-                    <input type="text" name="transferReceiverAccountName" id="transferReceiverAccountName"
-                        placeholder="Nom du compte récepteur">
+                    <select name="transferReceiverAccountName" id="transferReceiverAccountName">
+                    </select>
                     <label for="transferAmount">Montant du transfert</label>
                     <input type="number" name="transferAmount" id="transferAmount" placeholder="Montant du transfert">
                     <button type="submit" id="transfer">Transférer l'argent</button>
@@ -110,13 +110,23 @@
             </div>
         </div>
         <div>
-            <h2>Tous les clients</h2>
-            <div class="list">
-
+            <h2 class="sectionTitle">Tous les clients</h2>
+            <div class="list" id="clientsList">
+                <!-- Template d'affichage des informations du client -->
+                <div class="clientContainer">
+                    <div>
+                        <h3>Prénom et nom</h3>
+                        <p class="clientId">0123456789AZERTY</p>
+                    </div>
+                    <div>
+                        <p>Total des comptes dans la banque :</p>
+                        <p class="clientBalance"><b>103€</b></p>
+                    </div>
+                </div>
             </div>
         </div>
         <div>
-            <h2>Tous les comptes bancaires</h2>
+            <h2 class="sectionTitle">Tous les comptes bancaires</h2>
             <div class="list">
 
             </div>

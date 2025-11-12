@@ -149,13 +149,15 @@ function transfert(idClientDonator, accountNameDonator, idClientReciever, accoun
         return;
     }
     if (transferAmount > accountDonator.amount) {
-        return console.error("Vous ne pouvez pas transférer plus que le solde actuel du compte");
+        return { status: 'error', message: "Vous ne pouvez pas transférer plus que le solde actuel du compte" };
+        //return console.error("Vous ne pouvez pas transférer plus que le solde actuel du compte");
     }
     accountDonator.amount -= transferAmount;
     createTransaction(accountDonator, `Transfert de ${transferAmount}€ vers le compte de ${clientReciever.name} ${clientReciever.lastName}`);
     accountReciever.amount += transferAmount;
     createTransaction(accountReciever, `Transfert de ${transferAmount}€ depuis le compte de ${clientDonator.name} ${clientDonator.lastName}`);
-    return console.info(`Le transfert de ${transferAmount}€ a été effectué avec succès du compte ${accountDonator.accountName} de ${clientDonator.name} ${clientDonator.lastName} vers le compte ${accountReciever.accountName} de ${clientReciever.name} ${clientReciever.lastName}`);
+    //return console.info(`Le transfert de ${transferAmount}€ a été effectué avec succès du compte ${accountDonator.accountName} de ${clientDonator.name} ${clientDonator.lastName} vers le compte ${accountReciever.accountName} de ${clientReciever.name} ${clientReciever.lastName}`);
+    return { status: 'success', message: `Le transfert de ${transferAmount}€ a été effectué avec succès du compte ${accountDonator.accountName} de ${clientDonator.name} ${clientDonator.lastName} vers le compte ${accountReciever.accountName} de ${clientReciever.name} ${clientReciever.lastName}` };
 }
 
 function displayAccountBalance(idClient, accountName) {
@@ -186,7 +188,11 @@ function displayClientBalance(idClient) {
     allAccounts.forEach(account => {
         totalBalance += account.amount;
     });
-    return console.log(`La somme totale des comptes de ${client.name} ${client.lastName} est de ${totalBalance}€`);
+    if (totalBalance === undefined) {
+        totalBalance = 0;
+    }
+    return { status: 'success', message: `La somme totale des comptes de ${client.name} ${client.lastName} est de ${totalBalance}€`, totalBalance: totalBalance };
+    // return console.log(`La somme totale des comptes de ${client.name} ${client.lastName} est de ${totalBalance}€`);
 }
 
 function displayBankBalance() {
@@ -262,9 +268,30 @@ function putAccountsInSelects(idClient, selectId) {
     select.innerHTML += inputs;
 }
 
+// Affichage des clients dans le listing
+function putClientsInListing () {
+    const clientsListContainer = document.getElementById('clientsList');
+    const clients = datas.clients;
+    let clientsList = '';
+
+    clients.forEach(client => {
+        let clientTotalBalance = displayClientBalance(client.id);
+        let balance = clientTotalBalance.totalBalance;
+        clientsList += `<div class="clientContainer"><div><h3>${client.name} ${client.lastName}</h3><p class="clientId">${client.id}</p></div><div><p>Total des comptes dans la banque :</p><p class="clientBalance"><b>${balance}€</b></p></div></div>`
+    })
+
+    clientsListContainer.innerHTML = '';
+    clientsListContainer.innerHTML += clientsList;
+}
+
+function refreshDisplayedInfo() {
+    putClientsInSelects();
+    putClientsInListing();
+}
+
 // Gestion des formulaires
 document.addEventListener('DOMContentLoaded', () => {
-    putClientsInSelects();
+    refreshDisplayedInfo();
 
     //Gestion du formulaire de création de client
     const createClientButton = document.getElementById('createClient');
@@ -276,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('createClientFirstName').value = '';
         document.getElementById('createClientLastName').value = '';
         showAlert(result.status, result.message);
-        putClientsInSelects();
+        refreshDisplayedInfo();
     })
 
     //Gestion du formulaire de création de compte
@@ -291,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('createAccountName').value = '';
         document.getElementById('createAccountInitialDeposit').value = '';
         showAlert(result.status, result.message);
+        refreshDisplayedInfo();
     })
 
     //Gestion du formulaire de dépot d'argent
@@ -310,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('depositAccountName').value = '';
         document.getElementById('depositAmount').value = '';
         showAlert(result.status, result.message);
+        refreshDisplayedInfo();
     })
 
     //Gestion du formulaire de retrait d'argent
@@ -329,5 +358,35 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('withdrawalAccountName').value = '';
         document.getElementById('withdrawalAmount').value = '';
         showAlert(result.status, result.message);
+        refreshDisplayedInfo();
+    })
+
+    //Gesion du formulaire de transfert d'argent
+    const transferButton = document.getElementById('transfer');
+    const transferDonatorSelect = document.getElementById('transferSenderClientId');
+    const transferRecieverSelect = document.getElementById('transferReceiverClientId');
+    transferDonatorSelect.addEventListener('change', (e) => {
+        const idClient = e.target.value;
+        putAccountsInSelects(idClient, 'transferSenderAccountName');
+    })
+    transferRecieverSelect.addEventListener('change', (e) => {
+        const idClient = e.target.value;
+        putAccountsInSelects(idClient, 'transferReceiverAccountName');
+    })
+    transferButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        const idDonator = document.getElementById('transferSenderClientId').value;
+        const accountDonator = document.getElementById('transferSenderAccountName').value;
+        const idReceiver = document.getElementById('transferReceiverClientId').value;
+        const accountReceiver = document.getElementById('transferReceiverAccountName').value;
+        const transferAmount = Number(document.getElementById('transferAmount').value);
+        const result = transfert(idDonator, accountDonator, idReceiver, accountReceiver, transferAmount);
+        document.getElementById('transferSenderClientId').value = '';
+        document.getElementById('transferSenderAccountName').value = '';
+        document.getElementById('transferReceiverClientId').value = '';
+        document.getElementById('transferReceiverAccountName').value = '';
+        document.getElementById('transferAmount').value = '';
+        showAlert(result.status, result.message);
+        refreshDisplayedInfo();
     })
 });
