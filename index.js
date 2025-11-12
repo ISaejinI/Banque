@@ -103,10 +103,12 @@ function deleteAccount(idClient, accountName) {
         return;
     }
     if (account.amount > 0) {
-        return console.error("Le compte doit être vide pour pouvoir le supprimer");
+        return { status: 'error', message: "Le compte doit être vide pour pouvoir le supprimer" };
+        // return console.error("Le compte doit être vide pour pouvoir le supprimer");
     }
     datas.accounts.splice(datas.accounts.indexOf(account), 1);
-    return console.info("Le compte a bien été supprimé");
+    // return console.info("Le compte a bien été supprimé");
+    return { status: 'success', message: "Le compte a bien été supprimé" };
 }
 
 function deposit(idClient, accountName, depositAmount) {
@@ -292,11 +294,28 @@ function putAccountsInListing () {
 
     accounts.forEach(account => {
         let client = getClient(account.idClient);
-        accountsList += `<div class="accountContainer"><div><h3>${account.accountName}</h3><p class="clientId">${client.name} ${client.lastName} (ID : ${client.id})</p></div><div><p>Solde du compte :</p><p class="clientBalance"><b>${account.amount}€</b></p></div></div>`;
+        accountsList += `<div class="accountContainer"><div><h3>${account.accountName}</h3><p class="clientId">${client.name} ${client.lastName} (ID : ${client.id})</p></div><div><p>Solde du compte :</p><p class="clientBalance"><b>${account.amount}€</b></p></div><form><input type="hidden" name="deleteIdClient" value="${account.idClient}"><input type="hidden" name="deleteAccountName" value="${account.accountName}"><button type="submit" class="deleteAccount">Supprimer le compte</button></form></div>`;
     })
 
     accountsListContainer.innerHTML = '';
     accountsListContainer.innerHTML += accountsList;
+    addListenerToButtons();
+}
+
+//Gestion de la supression des comptes
+function addListenerToButtons () {
+    const deleteButtons = document.querySelectorAll('.deleteAccount');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const form = e.target.parentElement;
+            const idClient = form.deleteIdClient.value;
+            const accountName = form.deleteAccountName.value;
+            const result = deleteAccount(idClient, accountName);
+            showAlert(result.status, result.message);
+            refreshDisplayedInfo();
+        })
+    })
 }
 
 
