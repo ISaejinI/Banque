@@ -14,11 +14,29 @@ let datas = {
     accounts: []
 }
 
+//Initialisation de datas dans le local storage
+function initializeLocalStorage() {
+    if (!localStorage.getItem('bankDatas')) {
+        localStorage.setItem('bankDatas', JSON.stringify(datas));
+    }
+    return;
+}
+initializeLocalStorage();
+
+//Insertion des nouvelles données
+function pushDatasToLocalStorage(newDatas) {
+    localStorage.setItem('bankDatas', JSON.stringify(newDatas));
+}
+
 //Fonctions globales
 const generateRandomId = () => crypto.randomUUID();
 
+function getDatasFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('bankDatas'));
+}
+
 function getClient(idClient) {
-    const client = datas.clients.find(client => client.id === idClient);
+    const client = getDatasFromLocalStorage().clients.find(client => client.id === idClient);
     if (client === undefined) {
         console.error("Le client demandé n'existe pas");
         return false;
@@ -27,12 +45,17 @@ function getClient(idClient) {
 }
 
 function getAccount(idClient, accountName) {
-    const account = datas.accounts.find(account => account.idClient === idClient && account.accountName === accountName);
+    const account = getDatasFromLocalStorage().accounts.find(account => account.idClient === idClient && account.accountName === accountName);
     if (account === undefined) {
         console.error("Le compte demandé n'existe pas");
         return false;
     }
     return account;
+}
+
+function getAccountIndex(account) {
+    const localDatas = getDatasFromLocalStorage();
+    return localDatas.accounts.findIndex((clientAccount) => clientAccount.idClient === account.idClient && clientAccount.accountName === account.accountName);
 }
 
 function isValidNumber(value) {
@@ -52,7 +75,11 @@ function createTransaction(account, detail) {
         detail,
         date: getCurrentDateTime()
     }
-    account.transactions.push(newTransaction);
+
+    let localDatas = getDatasFromLocalStorage();
+    const accountIndex = getAccountIndex(account);
+    localDatas.accounts[accountIndex].transactions.push(newTransaction);
+    pushDatasToLocalStorage(localDatas);
 }
 
 //Fonctionnalités de l'application
@@ -63,7 +90,9 @@ function createClient(name, lastName) {
             name,
             lastName
         }
-        datas.clients.push(newClient);
+        let localDatas = getDatasFromLocalStorage();
+        localDatas.clients.push(newClient);
+        pushDatasToLocalStorage(localDatas);
         return { status: 'success', message: `Le client ${name} ${lastName} a été ajouté avec l'id ${newClient.id}` };
         // return console.info(`Le client ${name} ${lastName} a été ajouté avec l'id ${newClient.id}`);
     } else {
@@ -90,8 +119,10 @@ function createAccount(idClient, accountName, depositAmount) {
         amount: depositAmount,
         transactions: []
     }
+    let localDatas = getDatasFromLocalStorage();
+    localDatas.accounts.push(newAccount);
+    pushDatasToLocalStorage(localDatas);
     createTransaction(newAccount, `Compte créé avec un dépôt initial de ${depositAmount}€`);
-    datas.accounts.push(newAccount);
     // return console.info(`Le compte ${accountName} a été créé avec succès avec ${depositAmount}€ à l'intérieur`);
     return { status: 'success', message: `Le compte ${accountName} a été créé avec succès avec ${depositAmount}€ à l'intérieur` };
 }
@@ -106,7 +137,9 @@ function deleteAccount(idClient, accountName) {
         return { status: 'error', message: "Le compte doit être vide pour pouvoir le supprimer" };
         // return console.error("Le compte doit être vide pour pouvoir le supprimer");
     }
-    datas.accounts.splice(datas.accounts.indexOf(account), 1);
+    let localDatas = getDatasFromLocalStorage();
+    localDatas.accounts.splice(localDatas.accounts.indexOf(account), 1);
+    pushDatasToLocalStorage(localDatas);
     // return console.info("Le compte a bien été supprimé");
     return { status: 'success', message: "Le compte a bien été supprimé" };
 }
@@ -118,10 +151,13 @@ function deposit(idClient, accountName, depositAmount) {
     if (client === false || account === false || number === false) {
         return;
     }
-    account.amount += depositAmount;
+    let localDatas = getDatasFromLocalStorage();
+    const accountIndex = getAccountIndex(account);
+    localDatas.accounts[accountIndex].amount += depositAmount;
+    pushDatasToLocalStorage(localDatas);
     createTransaction(account, `Dépôt de ${depositAmount}€`);
     // return console.info(`Le dépôt de ${depositAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
-    return { status: 'success', message: `Le dépôt de ${depositAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€` };
+    return { status: 'success', message: `Le dépôt de ${depositAmount}€ a été effectué avec succès. Nouveau solde : ${localDatas.accounts[accountIndex].amount}€` };
 }
 
 function withdrawal(idClient, accountName, withdrawalAmount) {
@@ -131,13 +167,19 @@ function withdrawal(idClient, accountName, withdrawalAmount) {
     if (client === false || account === false || number === false) {
         return;
     }
-    if (withdrawalAmount > account.amount) {
+
+    let localDatas = getDatasFromLocalStorage();
+    const accountIndex = getAccountIndex(account);
+
+    if (withdrawalAmount > localDatas.accounts[accountIndex].amount) {
         return { status: 'error', message: "Vous ne pouvez pas retirer plus que le solde actuel du compte" };
         //return console.error("Vous ne pouvez pas retirer plus que le solde actuel du compte");
     }
-    account.amount -= withdrawalAmount;
+
+    localDatas.accounts[accountIndex].amount -= withdrawalAmount;
+    pushDatasToLocalStorage(localDatas);
     createTransaction(account, `Retrait de ${withdrawalAmount}€`);
-    return { status: 'success', message: `Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€` };
+    return { status: 'success', message: `Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${localDatas.accounts[accountIndex].amount}€` };
     //return console.info(`Le retrait de ${withdrawalAmount}€ a été effectué avec succès. Nouveau solde : ${account.amount}€`);
 }
 
@@ -150,14 +192,18 @@ function transfert(idClientDonator, accountNameDonator, idClientReciever, accoun
     if (clientDonator === false || clientReciever === false || accountDonator === false || accountReciever === false || number === false) {
         return;
     }
-    if (transferAmount > accountDonator.amount) {
+    let localDatas = getDatasFromLocalStorage();
+    const accountDonatorIndex = getAccountIndex(accountDonator);
+    const accountRecieverIndex = getAccountIndex(accountReciever);
+    if (transferAmount > localDatas.accounts[accountDonatorIndex].amount) {
         return { status: 'error', message: "Vous ne pouvez pas transférer plus que le solde actuel du compte" };
         //return console.error("Vous ne pouvez pas transférer plus que le solde actuel du compte");
     }
-    accountDonator.amount -= transferAmount;
+    localDatas.accounts[accountDonatorIndex].amount -= transferAmount;
     createTransaction(accountDonator, `Transfert de ${transferAmount}€ vers le compte de ${clientReciever.name} ${clientReciever.lastName}`);
-    accountReciever.amount += transferAmount;
+    localDatas.accounts[accountRecieverIndex].amount += transferAmount;
     createTransaction(accountReciever, `Transfert de ${transferAmount}€ depuis le compte de ${clientDonator.name} ${clientDonator.lastName}`);
+    pushDatasToLocalStorage(localDatas);
     //return console.info(`Le transfert de ${transferAmount}€ a été effectué avec succès du compte ${accountDonator.accountName} de ${clientDonator.name} ${clientDonator.lastName} vers le compte ${accountReciever.accountName} de ${clientReciever.name} ${clientReciever.lastName}`);
     return { status: 'success', message: `Le transfert de ${transferAmount}€ a été effectué avec succès du compte ${accountDonator.accountName} de ${clientDonator.name} ${clientDonator.lastName} vers le compte ${accountReciever.accountName} de ${clientReciever.name} ${clientReciever.lastName}` };
 }
@@ -185,7 +231,8 @@ function displayClientBalance(idClient) {
     if (client === false) {
         return;
     }
-    const allAccounts = datas.accounts.filter(account => account.idClient === idClient);
+    const localDatas = getDatasFromLocalStorage();
+    const allAccounts = localDatas.accounts.filter(account => account.idClient === idClient);
     let totalBalance = 0;
     allAccounts.forEach(account => {
         totalBalance += account.amount;
@@ -248,7 +295,8 @@ function showAlert(type, message) {
 //Gestion des valeurs des selects
 function putClientsInSelects() {
     const selects = document.querySelectorAll('.clientIdSelect');
-    const clients = datas.clients;
+    const localDatas = getDatasFromLocalStorage();
+    const clients = localDatas.clients;
     let inputs = `<option selected value="">Sélectionner un client</option>`;
     clients.forEach(client => {
         inputs += `<option value="${client.id}">${client.name} ${client.lastName} - ${client.id}</option>`;
@@ -261,7 +309,8 @@ function putClientsInSelects() {
 
 function putAccountsInSelects(idClient, selectId) {
     const select = document.getElementById(selectId);
-    const accounts = datas.accounts.filter(account => account.idClient === idClient);
+    const localDatas = getDatasFromLocalStorage();
+    const accounts = localDatas.accounts.filter(account => account.idClient === idClient);
     let inputs = `<option selected value="">Sélectionner un compte</option>`;
     accounts.forEach(account => {
         inputs += `<option value="${account.accountName}">${account.accountName} - ${account.amount}€</option>`;
@@ -271,9 +320,10 @@ function putAccountsInSelects(idClient, selectId) {
 }
 
 // Affichage des clients dans le listing
-function putClientsInListing () {
+function putClientsInListing() {
     const clientsListContainer = document.getElementById('clientsList');
-    const clients = datas.clients;
+    const localDatas = getDatasFromLocalStorage();
+    const clients = localDatas.clients;
     let clientsList = '';
 
     clients.forEach(client => {
@@ -287,9 +337,10 @@ function putClientsInListing () {
 }
 
 //Affichage des comptes dans le listing
-function putAccountsInListing () {
+function putAccountsInListing() {
     const accountsListContainer = document.getElementById('accountsList');
-    const accounts = datas.accounts;
+    const localDatas = getDatasFromLocalStorage();
+    const accounts = localDatas.accounts;
     let accountsList = '';
 
     accounts.forEach(account => {
@@ -303,7 +354,7 @@ function putAccountsInListing () {
 }
 
 //Gestion de la supression des comptes
-function addListenerToButtons () {
+function addListenerToButtons() {
     const deleteButtons = document.querySelectorAll('.deleteAccount');
     deleteButtons.forEach(button => {
         button.addEventListener('click', (e) => {
@@ -317,7 +368,6 @@ function addListenerToButtons () {
         })
     })
 }
-
 
 //Rafraichir toutes les informations affichées
 function refreshDisplayedInfo() {
